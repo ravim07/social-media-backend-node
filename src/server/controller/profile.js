@@ -12,7 +12,7 @@ const getProfile = async (req, res) => {
       });
     } else {
       const { _id } = authdata;
-      const user = await User.findOne({ _id });
+      const user = await User.findOne({ _id }).select('-hash_password');
       res.status(StatusCodes.OK).json({ message: "user!!", userData: user });
     }
   });
@@ -24,11 +24,27 @@ const updateProfile = async (req, res) => {
     if (req?.file == undefined) {
       return res.status(400).send({ message: "Upload a file please!" });
     }
-    res.status(200).send({
-      message:
-        "The following file was uploaded successfully: " +
-        req?.file?.originalname,
+
+    jwt.verify(req.token, secretKey, async (err, authdata) => {
+      if (err) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          message: "unauthorized user!!",
+        });
+      } else {
+        const { _id } = authdata;
+        const user = await User.findOne({ _id });
+        if(user){
+          await User.updateOne({$set:{profilePicture:req.file.path}})
+        }
+
+        res.status(200).send({
+          message:
+            "File was uploaded successfully: " +
+            req?.file?.originalname,
+        });
+      }
     });
+
   } catch (err) {
     if (err.code == "LIMIT_FILE_SIZE") {
       return res.status(500).send({
@@ -39,7 +55,6 @@ const updateProfile = async (req, res) => {
       message: `Unable to upload the file: ${req?.file?.originalname}. ${err}`,
     });
   }
-  console.log(req);
 };
 
 module.exports = { getProfile, updateProfile };

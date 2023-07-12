@@ -7,14 +7,12 @@ const secretKey = "secratkey";
 
 const signUp = async (req, res) => {
   const { firstName, lastName, email, password, mobileNo } = req.body;
-  console.log(req.body,"////?/")
   if (!firstName || !lastName || !email || !password  || !mobileNo) {
     return res.status(StatusCodes.BAD_REQUEST).json({
       message: "Please Provide Required Information",
     });
   }
   const hash_password = await bcrypt.hash(password, 10);
-
   const userData = {
     firstName,
     lastName,

@@ -8,14 +8,17 @@ const cors = require("cors");
 // const secretKey = "secratkey";
 // const bcrypt = require("bcrypt");
 const authRouter = require("./server/routes/auth");
+const profileRouter = require("./server/routes/profile");
 
 // using bodyParser to parse JSON bodies into JS objects
 app.use(bodyParser.json());
 
 // enabling CORS for all requests
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", authRouter);
+app.use("/api", profileRouter);
 
 const PORT = process.env.PORT || 8080;
 const saltRounds = 10;
