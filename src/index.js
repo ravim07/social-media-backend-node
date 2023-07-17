@@ -9,6 +9,8 @@ const cors = require("cors");
 // const bcrypt = require("bcrypt");
 const authRouter = require("./server/routes/auth");
 const profileRouter = require("./server/routes/profile");
+const productRouter = require("./server/routes/product");
+const userRouter = require("./server/routes/user");
 
 // using bodyParser to parse JSON bodies into JS objects
 app.use(bodyParser.json());
@@ -19,6 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", authRouter);
 app.use("/api", profileRouter);
+app.use("/api", productRouter);
+app.use("/api", userRouter);
 
 const PORT = process.env.PORT || 8080;
 const saltRounds = 10;
