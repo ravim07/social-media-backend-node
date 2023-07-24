@@ -41,7 +41,8 @@ const userSchema = new mongoose.Schema(
     },
     friends:[],
     pendingRequest:[],
-    sendedRequest:[]
+    sendedRequest:[],
+    post:[]
   },
   { timestamps: true }
 );

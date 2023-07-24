@@ -30,10 +30,6 @@ const addProduct = async (req, res, next) => {
         } else {
           const { _id } = authdata;
           productData.user_id = _id;
-          //   const product = await Product.findOne({ name });
-          //   if (product) {
-          //     return res.status(401).send("Product is already ragister");
-          //   }
           await Product.create(productData).then((data, err) => {
             if (err) {
               next(err);
@@ -52,80 +48,124 @@ const addProduct = async (req, res, next) => {
 };
 
 const getProduct = async (req, res, next) => {
-  jwt.verify(req.token, secretKey, async (err, authdata) => {
-    if (err) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "unauthorized user!!",
-      });
-    } else {
-      const { _id } = authdata;
-      const allProduct = await Product.find({ user_id: _id });
-      res
-        .status(StatusCodes.OK)
-        .json({ message: "user!!", product: allProduct });
-    }
-  });
+  try {
+    jwt.verify(req.token, secretKey, async (err, authdata) => {
+      if (err) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          message: "unauthorized user!!",
+        });
+      } else {
+        const { _id } = authdata;
+        const allProduct = await Product.find();
+        res
+          .status(StatusCodes.OK)
+          .json({ message: "user!!", product: allProduct });
+      }
+    });
+  } catch {
+    res.status(500).send({
+      message: `Something went wrong`,
+    });
+  }
 };
 
 const updateProduct = async (req, res, next) => {
-  jwt.verify(req.token, secretKey, async (err, authdata) => {
-    if (err) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "unauthorized user!!",
-      });
-    } else {
-      // const product = Product.findOne({_id: req.params.todoID});
+  try {
+    jwt.verify(req.token, secretKey, async (err, authdata) => {
+      if (err) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          message: "unauthorized user!!",
+        });
+      } else {
+        // const product = Product.findOne({_id: req.params.todoID});
 
-      await Product.findOneAndUpdate(
-        { _id: req.params.id },
-        {
-          $set: {
-            name: req.body.name,
-            detail: req.body.detail,
-            price: req.body.price,
-            category: req.body.category,
-          },
-        }
-      );
+        await Product.findOneAndUpdate(
+          { _id: req.params.id },
+          {
+            $set: {
+              name: req.body.name,
+              detail: req.body.detail,
+              price: req.body.price,
+              category: req.body.category,
+            },
+          }
+        );
 
-      const { _id } = authdata;
-      const allProduct = await Product.find({ user_id: _id });
-      res
-        .status(StatusCodes.OK)
-        .json({
+        const { _id } = authdata;
+        const allProduct = await Product.find({ user_id: _id });
+        res.status(StatusCodes.OK).json({
           message: "Produc updated successfully!!",
           product: allProduct,
         });
-    }
-  });
+      }
+    });
+  } catch (err) {
+    res.status(500).send({
+      message: `Something went wrong`,
+    });
+  }
 };
 
 const updateProductWithPatch = async (req, res, next) => {
-  jwt.verify(req.token, secretKey, async (err, authdata) => {
-    if (err) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "unauthorized user!!",
-      });
-    } else {
-      await Product.findOneAndUpdate(
-        { _id: req.params.id },
-        {
-          $set: {
-            ...req.body,
-          },
-        }
-      );
+  try {
+    jwt.verify(req.token, secretKey, async (err, authdata) => {
+      if (err) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          message: "unauthorized user!!",
+        });
+      } else {
+        await Product.findOneAndUpdate(
+          { _id: req.params.id },
+          {
+            $set: {
+              ...req.body,
+            },
+          }
+        );
 
-      const { _id } = authdata;
-      const allProduct = await Product.find({ user_id: _id });
-      res
-        .status(StatusCodes.OK)
-        .json({
+        const { _id } = authdata;
+        const allProduct = await Product.find({ user_id: _id });
+        res.status(StatusCodes.OK).json({
           message: "Product updated successfully!!",
           product: allProduct,
         });
-    }
-  });
+      }
+    });
+  } catch (err) {
+    res.status(500).send({
+      message: `Something went wrong`,
+    });
+  }
+};
+
+const deleteProduct = async (req, res, next) => {
+  try {
+    jwt.verify(req.token, secretKey, async (err, authdata) => {
+      if (err) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          message: "unauthorized user!!",
+        });
+      } else {
+        if (req.params.id) {
+          res.status(StatusCodes.BAD_REQUEST).json({
+            message: "Please send id Also!!",
+          });
+        }
+        await Product.findByIdAndDelete({ _id: req.params.id });
+
+        const { _id } = authdata;
+        const allProduct = await Product.find({ user_id: _id });
+        res.status(StatusCodes.OK).json({
+          message: "Product deleted successfully!!",
+          product: allProduct,
+        });
+      }
+    });
+  } catch (err) {
+    res.status(500).send({
+      message: `Something went wrong`,
+    });
+  }
 };
 
 module.exports = {
@@ -133,4 +173,5 @@ module.exports = {
   getProduct,
   updateProduct,
   updateProductWithPatch,
+  deleteProduct,
 };

@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
 const secretKey = "secratkey";
 const User = require("../modal/auth");
-const auth = require("../modal/auth");
 
 // pending request for the request which is comes to the me
 // sended request are the request which is i sended
@@ -71,6 +70,7 @@ const addFriend = async (req, res) => {
         });
       } else if (requestedUser.length > 0 && requestedUser.includes(userId)) {
         res.status(403).send({
+          code: 403,
           message: "Request is already a sended",
         });
       }
@@ -186,11 +186,10 @@ const getFriendList = async (req, res) => {
       });
     } else {
       const { _id } = authdata;
-      const user = await User.findOne({ _id }).select("-hash_password");
-      if (!user) {
+      const friendList = await User.findOne({ _id }).select("friends");
+      if (!friendList) {
         res.status(404).send("User not found!!");
       } else {
-        const friendList = user.friends;
         res
           .status(StatusCodes.OK)
           .json({ message: "friend list!!", friendList: friendList });

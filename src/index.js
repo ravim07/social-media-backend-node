@@ -11,6 +11,8 @@ const authRouter = require("./server/routes/auth");
 const profileRouter = require("./server/routes/profile");
 const productRouter = require("./server/routes/product");
 const userRouter = require("./server/routes/user");
+const postRouter = require("./server/routes/post");
+// const errorHandler = require("./server/middleware/errorhandler");
 
 // using bodyParser to parse JSON bodies into JS objects
 app.use(bodyParser.json());
@@ -23,6 +25,9 @@ app.use("/api", authRouter);
 app.use("/api", profileRouter);
 app.use("/api", productRouter);
 app.use("/api", userRouter);
+app.use("/api", postRouter);
+
+// app.use(errorHandler("Something went Wrong!"));
 
 const PORT = process.env.PORT || 8080;
 const saltRounds = 10;
